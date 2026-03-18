@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日热榜 | 年轻人的资讯站</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --primary: #ff6b9d; --secondary: #c44569; --accent: #00d2ff; --success: #00f5d4; }
+        body { font-family: 'Noto Sans SC', sans-serif; min-height: 100vh; color: #fff; overflow-x: hidden; }
+        body.dopamine { background: linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1, #fbc2eb, #ffecd2); background-size: 400% 400%; animation: gradient 10s ease infinite; }
+        body.tech { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+        body.cyber { background: linear-gradient(135deg, #000428, #004e92); }
+        body.nature { background: linear-gradient(135deg, #134e5e, #71b280); }
+        body.sunset { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+        @keyframes gradient { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .glass { background: rgba(255,255,255,0.1); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
+        header { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.3); backdrop-filter: blur(20px); padding: 15px 0; }
+        .header-content { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: 900; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary), #9b5de5); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .theme-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.3s; }
+        .theme-btn:hover, .theme-btn.active { transform: scale(1.2); border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
+        .theme-dopamine { background: linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1); }
+        .theme-tech { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+        .theme-cyber { background: linear-gradient(135deg, #000428, #004e92); }
+        .theme-nature { background: linear-gradient(135deg, #134e5e, #71b280); }
+        .theme-sunset { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
+        .main-layout { max-width: 1400px; margin: 0 auto; padding: 30px 20px; display: grid; grid-template-columns: 220px 1fr 280px; gap: 25px; }
+        @media (max-width: 1100px) { .main-layout { grid-template-columns: 1fr; } }
+        .sidebar-left { position: sticky; top: 100px; height: fit-content; }
+        .category-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 16px; cursor: pointer; transition: all 0.3s; margin-bottom: 8px; font-weight: 500; }
+        .category-item:hover { background: rgba(255,255,255,0.15); transform: translateX(5px); }
+        .category-item.active { background: linear-gradient(135deg, var(--primary), #9b5de5); box-shadow: 0 10px 30px rgba(155,93,229,0.4); }
+        .category-count { margin-left: auto; background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; }
+        .news-card { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; transition: all 0.3s; cursor: pointer; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .news-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.12); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .news-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), #9b5de5, var(--accent)); }
+        .news-tag { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .tag-ai { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .tag-tech { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+        .tag-entertainment { background: linear-gradient(135deg, #ff6b9d, #c44569); }
+        .tag-sports { background: linear-gradient(135deg, #00f5d4, #00b4db); }
+        .tag-finance { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .tag-car { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .tag-game { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .news-title { font-size: 1.15rem; font-weight: 700; line-height: 1.5; margin: 12px 0; }
+        .news-content { font-size: 0.95rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 15px; }
+        .news-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-size: 0.9rem; font-weight: 600; padding: 8px 16px; background: rgba(0,210,255,0.15); border-radius: 20px; transition: all 0.3s; }
+        .news-link:hover { background: rgba(0,210,255,0.3); transform: translateX(3px); }
+        .sidebar-right { position: sticky; top: 100px; height: fit-content; display: flex; flex-direction: column; gap: 20px; }
+        .wooden-fish { width: 120px; height: 120px; margin: 0 auto 15px; position: relative; cursor: pointer; }
+        .fish-body { width: 100%; height: 100%; background: linear-gradient(145deg, #d4a574, #8b6914); border-radius: 50% 50% 45% 45%; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.3), inset 10px 10px 20px rgba(255,255,255,0.2), 0 10px 30px rgba(0,0,0,0.4); position: relative; }
+        .fish-eye { position: absolute; width: 16px; height: 16px; background: #1a1a1a; border-radius: 50%; top: 35%; }
+        .fish-eye.left { left: 25%; } .fish-eye.right { right: 25%; }
+        .fish-mouth { position: absolute; bottom: 25%; left: 50%; transform: translateX(-50%); width: 25px; height: 12px; background: #1a1a1a; border-radius: 0 0 50% 50%; }
+        .merit-value { font-size: 2.2rem; font-weight: 900; background: linear-gradient(90deg, #ffd700, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .clock-time { font-size: 2rem; font-weight: 700; font-family: 'Courier New', monospace; background: linear-gradient(90deg, var(--accent), var(--success)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .study-upload { border: 2px dashed rgba(255,255,255,0.3); border-radius: 16px; padding: 25px 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .study-upload:hover { border-color: var(--accent); background: rgba(0,210,255,0.1); }
+        .refresh-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: none; border-radius: 16px; background: linear-gradient(135deg, var(--primary), #9b5de5); color: white; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(155,93,229,0.4); }
+        #fileInput { display: none; }
+    </style>
+</head>
+<body class="dopamine">
+    <header>
+        <div class="header-content">
+            <div class="logo"><div class="logo-icon">🔥</div><span>今日热榜</span></div>
+            <div style="display:flex;gap:8px">
+                <div class="theme-btn theme-dopamine active" onclick="setTheme('dopamine')"></div>
+                <div class="theme-btn theme-tech" onclick="setTheme('tech')"></div>
+                <div class="theme-btn theme-cyber" onclick="setTheme('cyber')"></div>
+                <div class="theme-btn theme-nature" onclick="setTheme('nature')"></div>
+                <div class="theme-btn theme-sunset" onclick="setTheme('sunset')"></div>
+            </div>
+        </div>
+    </header>
+    <div class="main-layout">
+        <aside class="sidebar-left glass">
+            <div style="padding:20px">
+                <div style="font-size:0.8rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:15px;padding-left:10px">资讯分类</div>
+                <div class="category-item active" onclick="selectCategory('all')"><span>🏠</span><span>推荐</span><span class="category-count">50</span></div>
+                <div class="category-item" onclick="selectCategory('ai')"><span>🤖</span><span>AI前沿</span><span class="category-count">10</span></div>
+                <div class="category-item" onclick="selectCategory('tech')"><span>💻</span><span>科技</span><span class="category-count">12</span></div>
+                <div class="category-item" onclick="selectCategory('entertainment')"><span>🎬</span><span>娱乐</span><span class="category-count">15</span></div>
+                <div class="category-item" onclick="selectCategory('sports')"><span>⚽</span><span>体育</span><span class="category-count">8</span></div>
+                <div class="category-item" onclick="selectCategory('finance')"><span>💰</span><span>财经</span><span class="category-count">10</span></div>
+                <div class="category-item" onclick="selectCategory('car')"><span>🚗</span><span>汽车</span><span class="category-count">6</span></div>
+                <div class="category-item" onclick="selectCategory('game')"><span>🎮</span><span>游戏</span><span class="category-count">9</span></div>
+            </div>
+        </aside>
+        <main>
+            <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:25px;padding:0 10px"><span id="sectionIcon">🏠</span> <span id="sectionTitle">今日推荐</span></h2>
+            <div id="newsGrid"></div>
+            <button class="refresh-btn" onclick="refreshNews()">🔄 换一批</button>
+        </main>
+        <aside class="sidebar-right">
+            <div class="glass" style="padding:20px 25px;text-align:center">
+                <div class="clock-time" id="clockTime">00:00:00</div>
+                <div style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-top:5px" id="clockDate">加载中...</div>
+            </div>
+            <div class="glass" style="padding:25px;text-align:center">
+                <div style="font-size:1rem;font-weight:600;margin-bottom:15px">🪷 电子木鱼</div>
+                <div class="wooden-fish" onclick="knockFish()">
+                    <div class="fish-body"><div class="fish-eye left"></div><div class="fish-eye right"></div><div class="fish-mouth"></div></div>
+                </div>
+                <div style="background:rgba(0,0,0,0.2);border-radius:16px;padding:15px">
+                    <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:8px">当前功德</div>
+                    <div class="merit-value" id="meritCount">0</div>
+                </div>
+            </div>
+            <div class="glass" style="padding:25px">
+                <div style="font-size:1rem;font-weight:600;margin-bottom:15px"><span>📚</span> AI学习资料库</div>
+                <div class="study-upload" onclick="document.getElementById('fileInput').click()">
+                    <div style="font-size:2rem;margin-bottom:10px">📤</div>
+                    <div style="font-size:0.9rem;color:rgba(255,255,255,0.6)">点击上传PDF/文档<br>打造个人知识库</div>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.md" multiple onchange="handleFileUpload(event)">
+                <div id="studyFiles"></div>
+            </div>
+        </aside>
+    </div>
+    <script>
+        let currentCategory='all', merit=parseInt(localStorage.getItem('merit'))||0, myStudyFiles=JSON.parse(localStorage.getItem('myStudyFiles'))||[];
+        const allNews=[
+            {id:1,category:'ai',title:'OpenAI GPT-5曝光：支持实时视频理解，多模态能力再升级',content:'据知情人士透露，GPT-5将具备实时视频流理解能力，用户可以直接上传视频并与AI进行实时对话分析。该模型预计将在今年第三季度发布，将采用全新的MoE架构，推理效率提升50%。',source:'TechCrunch',url:'https://openai.com',time:'2小时前'},
+            {id:2,category:'ai',title:'Claude 4正式发布：编程能力超越人类，在SWE-bench测试中达到95%准确率',content:'Anthropic最新发布的Claude 4模型在软件工程基准测试中创下了新纪录，不仅能理解复杂代码库，还能自主完成Bug修复和功能开发。开发者表示这是AI编程的重大突破。',source:'Anthropic Blog',url:'https://anthropic.com',time:'3小时前'},
+            {id:3,category:'ai',title:'Google DeepMind发布AlphaFold 3：预测所有生物分子结构精度大幅提升',content:'新版AlphaFold不仅能预测蛋白质结构，还能预测DNA、RNA小分子等相互作用，为药物研发提供更强大的工具。科学家表示这将彻底改变药物发现流程。',source:'Nature',url:'https://nature.com',time:'4小时前'},
+            {id:4,category:'ai',title:'xAI Grok-3正式上线：推理能力超越GPT-4，免费向所有用户开放',content:'马斯克旗下xAI发布Grok-3，声称在多项基准测试中超越GPT-4和Claude 3。目前已向Plus会员开放，预计下周全面免费。',source:'xAI',url:'https://x.ai',time:'5小时前'},
+            {id:5,category:'ai',title:'英伟达发布最强AI芯片B200：训练GPT-4时间缩短至1小时',content:'新一代Blackwell架构B200 GPU性能提升30倍，单卡可训练万亿参数模型。英伟达CEO黄仁勋表示这将推动AI进入新的时代。',source:'NVIDIA',url:'https://nvidia.com',time:'6小时前'},
+            {id:6,category:'tech',title:'iPhone 16 Pro全新设计曝光：取消实体按键，采用固态按键技术',content:'供应链消息显示，iPhone 16 Pro将首次取消所有实体按键，采用类似Mac的触控条设计，支持自定义快捷功能。全系将配备A18 Pro芯片，AI能力大幅提升。',source:'MacRumors',url:'https://macrumors.com',time:'1小时前'},
+            {id:7,category:'tech',title:'小米汽车SU7大卖：单月交付量突破2万台，创新势力纪录',content:'小米汽车官方宣布SU7单月交付量达到20310台，成为新势力最快达成月交付2万的品牌。雷军表示年底将冲击月交付3万台目标。',source:'小米汽车',url:'https://mi.com',time:'2小时前'},
+            {id:8,category:'tech',title:'SpaceX星舰第五次试飞成功：成功实现筷子夹住助推器',content:'SpaceX完成星舰第五次轨道级试飞，33台猛禽发动机全部正常工作，一级助推器成功被发射塔上的机械臂"筷子"精确捕获。人类向火星移民迈出重要一步。',source:'SpaceX',url:'https://spacex.com',time:'3小时前'},
+            {id:9,category:'entertainment',title:'《黑神话：悟空》销量突破3000万份，成为中国游戏里程碑',content:'游戏科学宣布《黑神话：悟空》全球销量正式突破3000万份，成为中国首个达到此成就的单机游戏。Steam同时在线人数再创新高。',source:'游戏科学',url:'https://gamek.com',time:'1小时前'},
+            {id:10,category:'entertainment',title:'周杰伦上海演唱会门票1秒售罄：黄牛票炒到5万一张',content:'周杰伦"嘉年华"世界巡回演唱会上海站门票开售后1秒即售罄，黄牛票价飙升至5万元。内场第一排座位被炒至10万，引发全网热议。',source:'微博',url:'https://weibo.com',time:'2小时前'},
+            {id:11,category:'entertainment',title:'Netflix韩剧《鱿鱼游戏2》预告发布：明年2月上线',content:'Netflix官方发布《鱿鱼游戏2》首支预告片，李政宰确认回归出演成奇勋。新增多位国际演员参与拍摄，制作成本高达1000亿韩元。',source:'Netflix',url:'https://netflix.com',time:'4小时前'},
+            {id:12,category:'sports',title:'中国男足0:3负于日本：18强赛两连败出线告急',content:'2026世界杯亚洲区18强赛，中国男足客场0:3不敌日本，遭遇两连败。小组出线形势严峻，下一场对阵澳大利亚必须全力争胜。',source:'央视体育',url:'https://cctv.com',time:'刚刚'},
+            {id:13,category:'sports',title:'郑钦文首夺WTA1000赛冠军：创造中国网球历史',content:'中国选手郑钦文在WTA1000迪拜站决赛中2-0击败斯瓦泰克，首夺WTA1000级别赛事冠军，成为中国网球历史第一人，世界排名将升至第7位。',source:'WTA',url:'https://wtatennis.com',time:'3小时前'},
+            {id:14,category:'finance',title:'A股大涨：上证指数突破3300点，成交量破万亿',content:'受政策利好刺激，A股今日全面大涨，上证指数涨超3%突破3300点，创业板指涨超4%。两市成交额突破1.5万亿，创近期新高。',source:'财联社',url:'https://cls.cn',time:'2小时前'},
+            {id:15,category:'finance',title:'比特币突破10万美元：创历史新高，市值超越特斯拉',content:'比特币价格首次突破10万美元大关，创历史新高，总市值达到2万亿美元，超越特斯拉成为全球市值第7大资产。分析师认为ETF资金流入是主要推手。',source:'CoinDesk',url:'https://coindesk.com',time:'4小时前'},
+            {id:16,category:'car',title:'比亚迪发布第五代DM技术：百公里油耗仅2.9L',content:'比亚迪正式发布第五代DM混动技术，亏电油耗低至2.9L/100km，满油满电续航超过2000公里。首搭车型秦L DM-i售价9.98万元起。',source:'比亚迪',url:'https://byd.com',time:'5小时前'},
+            {id:17,category:'car',title:'特斯拉FSD中国版开始测试：城市道路自动驾驶',content:'特斯拉中国宣布FSD（完全自动驾驶）功能开始在中国城市道路进行测试，首批面向部分Model 3/Y车主开放。这是特斯拉自动驾驶技术首次在中国落地。',source:'特斯拉',url:'https://tesla.cn',time:'6小时前'},
+            {id:18,category:'game',title:'《原神》5.0版本"纳塔"上线：全新火之国开放',content:'米哈游《原神》5.0版本"纳塔"正式上线，全新火之国地图开放，新增多位五星角色。版本更新包大小达30GB，创游戏史上最大更新纪录。',source:'米哈游',url:'https://mihoyo.com',time:'1小时前'},
+            {id:19,category:'game',title:'Steam同时在线人数突破3800万：创历史新高',content:'游戏平台Steam同时在线人数突破3800万，创历史新高。《黑神话：悟空》和《CS2》是主要推动力。Valve表示将继续优化服务器性能。',source:'SteamDB',url:'https://steamdb.info',time:'3小时前'},
+            {id:20,category:'ai',title:'Midjourney V7发布：支持4K视频生成，时长可达60秒',content:'AI图像生成工具Midjourney发布V7版本，首次支持视频生成功能，可生成4K分辨率、60秒时长的视频片段。运动一致性和画面质量大幅提升。',source:'Midjourney',url:'https://midjourney.com',time:'7小时前'}
+        ];
+        function init(){ updateClock(); setInterval(updateClock,1000); document.getElementById('meritCount').textContent=merit; renderNews(); renderStudyFiles(); }
+        function updateClock(){ const now=new Date(); document.getElementById('clockTime').textContent=now.toLocaleTimeString('zh-CN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('clockDate').textContent=now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'}); }
+        function setTheme(theme){ document.body.className=theme; document.querySelectorAll('.theme-btn').forEach(btn=>btn.classList.remove('active')); document.querySelector('.theme-'+theme).classList.add('active'); }
+        function selectCategory(cat){ currentCategory=cat; document.querySelectorAll('.category-item').forEach((item,i)=>item.classList.toggle('active',i==['all','ai','tech','entertainment','sports','finance','car','game'].indexOf(cat))); document.getElementById('sectionIcon').textContent={'all':'🏠','ai':'🤖','tech':'💻','entertainment':'🎬','sports':'⚽','finance':'💰','car':'🚗','game':'🎮'}[cat]; document.getElementById('sectionTitle').textContent={'all':'今日推荐','ai':'AI前沿','tech':'科技资讯','entertainment':'娱乐八卦','sports':'体育快讯','finance':'财经要闻','car':'汽车资讯','game':'游戏动态'}[cat]; renderNews(); }
+        function renderNews(){ const filtered=currentCategory==='all'?allNews:allNews.filter(n=>n.category===currentCategory); const grid=document.getElementById('newsGrid'); grid.innerHTML=filtered.map((news,i)=>`<div class="news-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span class="news-tag tag-${news.category}">${{'ai':'🤖 AI','tech':'💻 科技','entertainment':'🎬 娱乐','sports':'⚽ 体育','finance':'💰 财经','car':'🚗 汽车','game':'🎮 游戏'}[news.category]}</span><span style="font-size:0.8rem;color:rgba(255,255,255,0.5)">🕐 ${news.time}</span></div><h3 class="news-title">${news.title}</h3><p class="news-content">${news.content}</p><div style="display:flex;justify-content:space-between;align-items:center;padding-top:15px;border-top:1px solid rgba(255,255,255,0.1)"><span style="font-size:0.85rem;color:rgba(255,255,255,0.5)">📰 ${news.source}</span><a href="${news.url}" target="_blank" class="news-link">阅读原文 →</a></div></div>`).join(''); }
+        function knockFish(){ merit++; localStorage.setItem('merit',merit); document.getElementById('meritCount').textContent=merit; const fish=document.querySelector('.wooden-fish'); fish.style.transform='scale(0.9)'; setTimeout(()=>fish.style.transform='scale(1)',100); const audio=new(window.AudioContext||window.webkitAudioContext)(); const osc=audio.createOscillator(); const gain=audio.createGain(); osc.connect(gain); gain.connect(audio.destination); osc.frequency.value=800; gain.gain.setValueAtTime(0.3,audio.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,audio.currentTime+0.1); osc.start(); osc.stop(audio.currentTime+0.1); }
+        function handleFileUpload(e){ const files=Array.from(e.target.files); files.forEach(file=>{ myStudyFiles.push({name:file.name,size:(file.size/1024).toFixed(1)+'KB',date:new Date().toLocaleDateString()}); }); localStorage.setItem('myStudyFiles',JSON.stringify(myStudyFiles)); renderStudyFiles(); }
+        function renderStudyFiles(){ const container=document.getElementById('studyFiles'); container.innerHTML=myStudyFiles.map(f=>`<div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.08);border-radius:12px;font-size:0.85rem;margin-top:10px"><span style="font-size:1.2rem">📄</span><div style="flex:1"><div style="font-weight:600">${f.name}</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.5)">${f.size} · ${f.date}</div></div></div>`).join(''); }
+        function refreshNews(){ const btn=document.querySelector('.refresh-btn'); btn.style.transform='rotate(360deg)'; setTimeout(()=>btn.style.transform='rotate(0deg)',500); allNews.sort(()=>Math.random()-0.5); renderNews(); }
+        init();
+    </script>
+</body>
+</html>
